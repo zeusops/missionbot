@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import discord  # pip install --user discord.py
 import asyncio
 import config as cfg
