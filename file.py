@@ -18,9 +18,9 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print("----")
-    server = client.get_server(cfg.serverid)
-    channel = server.get_channel(cfg.channelid)
-    #await client.send_message(channel, "I am alive")
+    #server = client.get_guild(cfg.serverid)
+    channel = client.get_channel(cfg.channelid)
+    #await client.send(channel, "no u")
 
 @client.event
 async def on_message(message):
@@ -36,27 +36,27 @@ async def on_message(message):
     if attachments > 0:
         print("Attachment count:", attachments)
         for attachment in message.attachments:
-            print("Filename:", attachment['filename'])
-            ext = attachment['filename'][-3:]
+            print("Filename:", attachment.filename)
+            ext = attachment.filename[-3:]
             print("Ext:", ext)
             if ext == "pbo":
                 print("Found a PBO")
                 print("Checking if exists")
-                outfile = downloadfolder + "/" + attachment['filename']
+                outfile = downloadfolder + "/" + attachment.filename
                 if os.path.isfile(outfile):
                     print("{} exists".format(outfile))
-                    await client.send_message(message.channel, "File {} exists already!".format(attachment['filename']))
+                    await message.channel.send("File {} exists already!".format(attachment.filename))
                     return
                 print("Should download now")
-                print("url:", attachment['url'])
+                print("url:", attachment.url)
                 #r = urllib.request
                 #r.add_header("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0")
-                #r.urlretrieve(attachment['url'], downloadfolder + "/" + attachment['filename'])
-                ret = os.system("wget {} -O {}".format(attachment['url'], outfile))
+                #r.urlretrieve(attachment.url, downloadfolder + "/" + attachment.filename)
+                ret = os.system("wget {} -O {}".format(attachment.url, outfile))
                 if ret == 0:
-                    await client.send_message(message.channel, "Uploaded")
+                    await message.channel.send("Uploaded")
                 else:
-                    await client.send_message(message.channel, "Error. Request manual upload or try again.")
+                    await message.channel.send("Error. Request manual upload or try again.")
 
 def is_me(m):
     return m.author == client.user
