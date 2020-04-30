@@ -10,20 +10,25 @@ import os.path
 print("Connecting")
 client = discord.Client()
 
-downloadfolder = "/home/steam/arma3/mpmissions"
+downloadfolder = "/home/bots/link/mpmissions"
+
+gehock = None
 
 @client.event
 async def on_ready():
+    global gehock
     print("Logged in as")
     print(client.user.name)
     print(client.user.id)
     print("----")
     #server = client.get_guild(cfg.serverid)
-    channel = client.get_channel(cfg.channelid)
+    #channel = client.get_channel(cfg.channelid)
+    gehock = client.get_user(150625032656125952)
     #await client.send(channel, "no u")
 
 @client.event
 async def on_message(message):
+    global gehock
     print("#{}: <{}> {}".format(message.channel, message.author, message.content))
     #if message.author == client.user:
     #    return
@@ -54,7 +59,8 @@ async def on_message(message):
                 #r.urlretrieve(attachment.url, downloadfolder + "/" + attachment.filename)
                 ret = os.system("wget {} -O {}".format(attachment.url, outfile))
                 if ret == 0:
-                    await message.channel.send("Uploaded")
+                    #await message.channel.send("Uploaded")
+                    await message.channel.send("{} pls upload".format(gehock.mention))
                 else:
                     await message.channel.send("Error. Request manual upload or try again.")
 
