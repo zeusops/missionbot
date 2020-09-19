@@ -10,9 +10,8 @@ import os.path
 print("Connecting")
 client = discord.Client()
 
-downloadfolder = "/home/bots/link/mpmissions"
-
 gehock = None
+downloadfolder = "/home/zeusops/link/mpmissions"
 
 @client.event
 async def on_ready():
@@ -59,8 +58,8 @@ async def on_message(message):
                 #r.urlretrieve(attachment.url, downloadfolder + "/" + attachment.filename)
                 ret = os.system("wget {} -O {}".format(attachment.url, outfile))
                 if ret == 0:
-                    #await message.channel.send("Uploaded")
-                    await message.channel.send("{} pls upload".format(gehock.mention))
+                    await message.channel.send("Uploaded")
+                    #await message.channel.send("{} pls upload".format(gehock.mention))
                 else:
                     await message.channel.send("Error. Request manual upload or try again.")
 
