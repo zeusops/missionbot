@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import discord  # pip install --user discord.py
-import asyncio
+import discord
+#import asyncio
 import config as cfg
 import urllib.request
 import os
-import os.path
+import subprocess
 
 
 print("Connecting")
@@ -41,7 +41,7 @@ async def on_message(message):
         print("Attachment count:", attachments)
         for attachment in message.attachments:
             print("Filename:", attachment.filename)
-            ext = attachment.filename[-3:]
+            ext = attachment.filename.split('.')[-1]
             print("Ext:", ext)
             if ext == "pbo":
                 print("Found a PBO")
@@ -56,10 +56,17 @@ async def on_message(message):
                 #r = urllib.request
                 #r.add_header("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0")
                 #r.urlretrieve(attachment.url, downloadfolder + "/" + attachment.filename)
-                ret = os.system("wget {} -O {}".format(attachment.url, outfile))
-                if ret == 0:
+                ret = subprocess.run(["wget", attachment.url, "-O", outfile])
+                if ret.returncode == 0:
                     await message.channel.send("Uploaded")
                     #await message.channel.send("{} pls upload".format(gehock.mention))
+                    try:
+                        info=subprocess.check_output(["./pboinfo.py", attachment.filename]).decode('utf-8')
+                    except Exception as e:
+                        print(e.output)
+                        await message.channel.send("Failed to get PBO info")
+                    else:
+                        await message.channel.send(info)
                 else:
                     await message.channel.send("Error. Request manual upload or try again.")
 
