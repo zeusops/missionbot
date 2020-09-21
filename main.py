@@ -64,7 +64,7 @@ async def on_message(message):
                         info=subprocess.check_output(["./pboinfo.py", attachment.filename]).decode('utf-8')
                     except Exception as e:
                         print(e.output)
-                        await message.channel.send("Failed to get PBO info")
+                        await message.channel.send("{} Failed to get PBO info".format(gehock.mention))
                     else:
                         await message.channel.send(info)
                 else:
