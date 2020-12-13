@@ -49,7 +49,7 @@ async def on_message(message):
                 outfile = downloadfolder + "/" + attachment.filename
                 if os.path.isfile(outfile):
                     print("{} exists".format(outfile))
-                    await message.channel.send("File {} exists already!".format(attachment.filename))
+                    await message.channel.send("File {} already exists!".format(attachment.filename))
                     return
                 print("Should download now")
                 print("url:", attachment.url)
@@ -64,7 +64,7 @@ async def on_message(message):
                         info=subprocess.check_output(["./pboinfo.py", attachment.filename]).decode('utf-8')
                     except Exception as e:
                         print(e.output)
-                        await message.channel.send("{} Failed to get PBO info".format(gehock.mention))
+                        await message.channel.send("Failed to get PBO info")
                     else:
                         await message.channel.send(info)
                 else:

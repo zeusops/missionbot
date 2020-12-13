@@ -44,9 +44,9 @@ if match:
                       .date().isoformat()
     except ValueError:
         # Couldn't find a date in filename, this is not necessarily an error
-        filename_date="NOTFOUND"
+        filename_date="INVALID FORMAT"
 else:
-    filename_date="NOTFOUND"
+    filename_date="INVALID FORMAT"
 
 # TODO: Make path portable
 try:
