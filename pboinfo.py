@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import subprocess
 import pathlib
 import json
@@ -9,7 +10,7 @@ import urllib.request
 import re
 from datetime import datetime
 
-platform="wsl"
+platform="linux"
 
 try:
     with urllib.request.urlopen(
@@ -29,7 +30,8 @@ if platform=="windows":
 elif platform=="wsl":
     missionpath="/mnt/c/server/link/mpmissions"
 else:
-    missionpath="/home/zeusops/link/mpmissions"
+    home = os.environ['HOME']
+    missionpath=f"{home}/link/mpmissions"
 
 missions=pathlib.Path(missionpath)
 
@@ -50,7 +52,7 @@ else:
 
 # TODO: Make path portable
 try:
-    output=subprocess.check_output(["/home/zeusops/files/bin/pboinfo", "-j",
+    output=subprocess.check_output([f"{home}/files/bin/pboinfo", "-j",
                                    str(missions / filename)], timeout=10)
 except subprocess.CalledProcessError as e:
     print("Call to pboinfo failed:")
