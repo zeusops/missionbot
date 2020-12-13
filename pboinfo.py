@@ -51,7 +51,7 @@ else:
 # TODO: Make path portable
 try:
     output=subprocess.check_output(["/home/zeusops/files/bin/pboinfo", "-j",
-                                   str(missions / filename)])
+                                   str(missions / filename)], timeout=10)
 except subprocess.CalledProcessError as e:
     print("Call to pboinfo failed:")
     print(e.output.decode('utf-8'))
