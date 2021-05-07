@@ -65,7 +65,7 @@ if info['version'] != 'NOTFOUND':
             version_info="PBO uses an outdated template version: {}, latest version: {}" \
                         .format(pbo_version, latest_version)
         else:
-            version_info="PBO template version is up to date"
+            version_info="PBO template version is up to date ({})".format(pbo_version)
     else:
         version_info="Couldn't check latest template version"
 else:
