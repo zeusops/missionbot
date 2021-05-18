@@ -1,75 +1,76 @@
 #!/usr/bin/env python3
-import discord
-#import asyncio
-import config as cfg
-import urllib.request
 import os
+import pathlib
 import subprocess
+import traceback
+
+from discord.ext import commands
+from discord import ChannelType
+
+import config as cfg
 
 
-print("Connecting")
-client = discord.Client()
+class Bot(commands.Bot):
+    downloadfolder = pathlib.Path(f'{os.environ["HOME"]}/link/mpmissions')
 
-gehock = None
-downloadfolder = "/home/zeusops/link/mpmissions"
+    def __init__(self, *argv, **argc):
+        super().__init__(*argv, **argc)
+        self.gehock = None
+        #self.add_listener(self.on_ready)
+        #self.add_listener(self.on_message)
 
-@client.event
-async def on_ready():
-    global gehock
-    print("Logged in as")
-    print(client.user.name)
-    print(client.user.id)
-    print("----")
-    #server = client.get_guild(cfg.serverid)
-    #channel = client.get_channel(cfg.channelid)
-    gehock = client.get_user(150625032656125952)
-    #await client.send(channel, "no u")
+    async def on_ready(self):
+        print("Logged in as")
+        print(self.user.name)
+        print(self.user.id)
+        print("----")
+        #server = client.get_guild(cfg.serverid)
+        #channel = client.get_channel(cfg.channelid)
+        self.owner = await self.fetch_user(150625032656125952)
+        print("owner", self.owner)
+        self.owner_dm = self.owner.dm_channel
 
-@client.event
-async def on_message(message):
-    print(f"#{message.channel}: <{message.author}> {message.content}")
-    #if message.author == client.user:
-    #    return
-    for user in message.mentions:
-        print(f"id {user.id}, name {user.name}")
+    async def on_message(self, message):
+        if self.is_me(message):
+            return
+        if (message.channel.id not in cfg.CHANNEL_IDS
+                and not (message.channel.type == ChannelType.private
+                         and message.author == self.owner)):
+            print(f"#{message.channel}: <{message.author}> {message.content}")
+            return
 
-    #if client.user in message.mentions:
-    #    print("Ping!")
-    attachments = len(message.attachments)
-    if attachments > 0:
-        print("Attachment count:", attachments)
-        for attachment in message.attachments:
-            print("Filename:", attachment.filename)
-            ext = attachment.filename.split('.')[-1]
-            print("Ext:", ext)
-            if ext == "pbo":
-                print("Found a PBO")
-                print("Checking if exists")
-                outfile = downloadfolder + "/" + attachment.filename
+        if message.attachments:
+            for attachment in message.attachments:
+                ext = attachment.filename.split('.')[-1]
+                if ext != 'pbo':
+                    print(f"{attachment.filename} is not a pbo")
+                    await message.channel.send("Not a pbo, not uploading")
+                    return
+                outfile = self.downloadfolder / attachment.filename
                 if os.path.isfile(outfile):
                     print(f"{outfile} exists")
-                    await message.channel.send(f"File {attachement.filename} already exists!")
+                    await message.channel.send(f"File {attachment.filename} already exists!")
                     return
-                print("Should download now")
-                print("url:", attachment.url)
-                #r = urllib.request
-                #r.add_header("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0")
-                #r.urlretrieve(attachment.url, downloadfolder + "/" + attachment.filename)
-                ret = subprocess.run(["wget", attachment.url, "-O", outfile])
-                if ret.returncode == 0:
-                    await message.channel.send("Uploaded")
-                    #await message.channel.send(f"{gehock.mention} pls upload")
-                    try:
-                        info=subprocess.check_output(["./pboinfo.py", attachment.filename]).decode('utf-8')
-                    except Exception as e:
-                        print(e.output)
-                        await message.channel.send("Failed to get PBO info")
-                    else:
-                        await message.channel.send(info)
-                else:
+                print("Should save now")
+                #await message.channel.send(f"{gehock.mention} pls upload")
+                if await attachment.save(outfile) != attachment.size:
                     await message.channel.send("Error. Request manual upload or try again.")
+                    return
+                await message.channel.send("Uploaded")
+                try:
+                    info=subprocess.check_output(["./pboinfo.py", outfile]).decode('utf-8')
+                except Exception as e:
+                    traceback.print_exc()
+                    await message.channel.send("Failed to get PBO info")
+                else:
+                    await message.channel.send(info)
 
-def is_me(m):
-    return m.author == client.user
+    def is_me(self, m):
+        return m.author == self.user
 
-client.run(cfg.TOKEN)
+if __name__ == "__main__":
+
+    print("Connecting")
+    bot = Bot('.')
+
+    bot.run(cfg.TOKEN)

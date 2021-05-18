@@ -51,7 +51,7 @@ def main():
     #filename="Zeus_190920_Petterson.vt7.pbo"
     filename=args.filename
 
-    match=re.search("^Zeus_(\d\d\d\d\d\d)_", filename)
+    match=re.search("^Zeus_(\d\d\d\d\d\d)_", os.path.basename(filename))
     if match:
         date_string=match.group(1)
         try:
@@ -66,7 +66,7 @@ def main():
     # TODO: Make path portable
     try:
         output=subprocess.check_output([f"{home}/files/bin/pboinfo", "-j",
-                                       str(missions / filename)], timeout=10)
+                                       filename], timeout=10)
     except subprocess.CalledProcessError as e:
         print("Call to pboinfo failed:")
         print(e.output.decode('utf-8'))
