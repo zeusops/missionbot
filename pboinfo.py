@@ -77,22 +77,21 @@ def main():
         if latest_version:
             pbo_version=version.parse(info['version'])
             if pbo_version < latest_version:
-                version_info="PBO uses an outdated template version: {}, latest version: {}" \
-                            .format(pbo_version, latest_version)
+                version_info=f"PBO uses an outdated template version: {pbo_version}, latest version: {latest_version}"
             else:
-                version_info="PBO template version is up to date ({})".format(pbo_version)
+                version_info=f"PBO template version is up to date ({pbo_version})"
         else:
             version_info="Couldn't check latest template version"
     else:
         version_info="No template version found"
 
-    print("""PBO information:
+    print(f"""PBO information:
 
-            Date from filename: {}
-            Operation name: {}
-            Author: {}
-            Faction: {}
-            {}""".format(filename_date, info['operation'], info['author'], info['faction'], version_info))
+            Date from filename: {filename_date}
+            Operation name: {info['operation']}
+            Author: {info['author']}
+            Faction: {info['faction']}
+            {version_info}""")
 
 if __name__ == "__main__":
     main()

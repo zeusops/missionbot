@@ -27,12 +27,11 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global gehock
-    print("#{}: <{}> {}".format(message.channel, message.author, message.content))
+    print(f"#{message.channel}: <{message.author}> {message.content}")
     #if message.author == client.user:
     #    return
     for user in message.mentions:
-        print("id {}, name {}".format(user.id, user.name))
+        print(f"id {user.id}, name {user.name}")
 
     #if client.user in message.mentions:
     #    print("Ping!")
@@ -48,8 +47,8 @@ async def on_message(message):
                 print("Checking if exists")
                 outfile = downloadfolder + "/" + attachment.filename
                 if os.path.isfile(outfile):
-                    print("{} exists".format(outfile))
-                    await message.channel.send("File {} already exists!".format(attachment.filename))
+                    print(f"{outfile} exists")
+                    await message.channel.send(f"File {attachement.filename} already exists!")
                     return
                 print("Should download now")
                 print("url:", attachment.url)
@@ -59,7 +58,7 @@ async def on_message(message):
                 ret = subprocess.run(["wget", attachment.url, "-O", outfile])
                 if ret.returncode == 0:
                     await message.channel.send("Uploaded")
-                    #await message.channel.send("{} pls upload".format(gehock.mention))
+                    #await message.channel.send(f"{gehock.mention} pls upload")
                     try:
                         info=subprocess.check_output(["./pboinfo.py", attachment.filename]).decode('utf-8')
                     except Exception as e:
