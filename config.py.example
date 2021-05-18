@@ -1,2 +1,3 @@
 TOKEN = 'token'
 CHANNEL_IDS = [1, 2]
+REMOTE_FOLDER = '/mount/point'
