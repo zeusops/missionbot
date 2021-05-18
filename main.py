@@ -10,24 +10,42 @@ from discord import ChannelType
 import config as cfg
 
 
-class Bot(commands.Bot):
-    downloadfolder = pathlib.Path(f'{os.environ["HOME"]}/link/mpmissions')
+def detect_platform():
+    import sys
+    if sys.platform in ["Windows, cygwin"]:
+        return "windows"
+    elif sys.platform == "linux":
+        import platform
+        if "Microsoft" in platform.release():
+            return "wsl"
+        else:
+            return "linux"
 
+
+class Bot(commands.Bot):
     def __init__(self, *argv, **argc):
         super().__init__(*argv, **argc)
         self.gehock = None
-        #self.add_listener(self.on_ready)
-        #self.add_listener(self.on_message)
+
+        platform = detect_platform()
+        home = os.environ['HOME']
+        if platform == "windows":
+            missionpath = "C:/server/link/mpmissions"
+        elif platform == "wsl":
+            missionpath = "/mnt/c/server/link/mpmissions"
+        else:
+            missionpath = f"{home}/link/mpmissions"
+
+        self.downloadfolder = pathlib.Path(missionpath)
 
     async def on_ready(self):
         print("Logged in as")
         print(self.user.name)
         print(self.user.id)
         print("----")
-        #server = client.get_guild(cfg.serverid)
-        #channel = client.get_channel(cfg.channelid)
+        # server = client.get_guild(cfg.serverid)
+        # channel = client.get_channel(cfg.channelid)
         self.owner = await self.fetch_user(150625032656125952)
-        print("owner", self.owner)
         self.owner_dm = self.owner.dm_channel
 
     async def on_message(self, message):
@@ -49,17 +67,19 @@ class Bot(commands.Bot):
                 outfile = self.downloadfolder / attachment.filename
                 if os.path.isfile(outfile):
                     print(f"{outfile} exists")
-                    await message.channel.send(f"File {attachment.filename} already exists!")
+                    await message.channel.send(f"File {attachment.filename} "
+                                               "already exists!")
                     return
-                print("Should save now")
-                #await message.channel.send(f"{gehock.mention} pls upload")
+                # await message.channel.send(f"{gehock.mention} pls upload")
                 if await attachment.save(outfile) != attachment.size:
-                    await message.channel.send("Error. Request manual upload or try again.")
+                    await message.channel.send("Error. Request manual upload "
+                                               "or try again.")
                     return
                 await message.channel.send("Uploaded")
                 try:
-                    info=subprocess.check_output(["./pboinfo.py", outfile]).decode('utf-8')
-                except Exception as e:
+                    info = subprocess.check_output(["./pboinfo.py",
+                                                    outfile]).decode('utf-8')
+                except Exception:
                     traceback.print_exc()
                     await message.channel.send("Failed to get PBO info")
                 else:
@@ -68,8 +88,8 @@ class Bot(commands.Bot):
     def is_me(self, m):
         return m.author == self.user
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     print("Connecting")
     bot = Bot('.')
 
