@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os
 import subprocess
 import json
@@ -10,7 +10,7 @@ import re
 from datetime import datetime
 
 
-def main():
+def get_info(filename):
     try:
         with urllib.request.urlopen(
                 'https://raw.githubusercontent.com/zeusops/mission-templates/'
@@ -21,13 +21,7 @@ def main():
     except urllib.error.HTTPError:
         latest_version = None
 
-    parser = argparse.ArgumentParser(description="Parse pbo info")
-    parser.add_argument('filename', metavar='FILE', help="PBO file to check")
-    args = parser.parse_args()
-
     home = os.environ['HOME']
-
-    filename = args.filename
 
     match = re.search("^Zeus_(\\d\\d\\d\\d\\d\\d)_",
                       os.path.basename(filename))
@@ -50,7 +44,7 @@ def main():
     except subprocess.CalledProcessError as e:
         print("Call to pboinfo failed:")
         print(e.output.decode('utf-8'))
-        sys.exit(1)
+        return False
     info = json.loads(output)
     if info['version'] != 'NOTFOUND':
         if latest_version:
@@ -67,7 +61,7 @@ def main():
     else:
         version_info = "No template version found"
 
-    print(f"""PBO information:
+    return (f"""PBO information:
 
             Date from filename: {filename_date}
             Operation name: {info['operation']}
@@ -77,4 +71,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Parse pbo info")
+    parser.add_argument('filename', metavar='FILE', help="PBO file to check")
+    args = parser.parse_args()
+
+    ret = get_info(args.filename)
+    if not ret:
+        sys.exit(1)
+    else:
+        print(ret)

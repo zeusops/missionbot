@@ -2,13 +2,13 @@
 import os
 import pathlib
 import shutil
-import subprocess
 import traceback
 
 from discord.ext import commands
 from discord import ChannelType
 
 import config as cfg
+from pboinfo import get_info
 
 
 def detect_platform():
@@ -30,6 +30,8 @@ class Bot(commands.Bot):
 
         platform = detect_platform()
         home = os.environ['HOME']
+        print(home)
+        print(os.environ)
         if platform == "windows":
             missionpath = "C:/server/link/mpmissions"
         elif platform == "wsl":
@@ -87,11 +89,8 @@ class Bot(commands.Bot):
                 return
             await message.channel.send("Uploaded")
             print("Saved")
-            try:
-                info = subprocess.check_output(["./pboinfo.py",
-                                                outfile]).decode('utf-8')
-            except Exception:
-                traceback.print_exc()
+            info = get_info(outfile)
+            if not info:
                 await message.channel.send("Failed to get PBO info")
             else:
                 await message.channel.send(info)
