@@ -60,55 +60,53 @@ class Bot(commands.Bot):
             return
 
         print("Received a message")
-        # TODO: remove if
-        if message.attachments:
-            for attachment in message.attachments:
-                name = attachment.filename
-                ext = name.split('.')[-1]
-                if ext != 'pbo':
-                    print(f"{name} is not a pbo")
-                    await message.channel.send("Not a pbo, not uploading")
+        for attachment in message.attachments:
+            name = attachment.filename
+            ext = name.split('.')[-1]
+            if ext != 'pbo':
+                print(f"{name} is not a pbo")
+                await message.channel.send("Not a pbo, not uploading")
+                return
+            print(f"Handling {name}")
+            path = self.remote_folder or self.local_folder
+            final_path = path / name
+            print("Checking existing file")
+            try:
+                if os.path.isfile(final_path):
+                    print(f"{final_path} exists")
+                    await message.channel.send(f"File {name} "
+                                               "already exists!")
                     return
-                print(f"Handling {name}")
-                path = self.remote_folder or self.local_folder
-                final_path = path / name
-                print("Checking existing file")
+            except OSError:
+                # Will download locally, check the PBO and complain later
+                pass
+            outfile = self.local_folder / name
+            if await attachment.save(outfile) != attachment.size:
+                await message.channel.send("Save failed. Request a manual "
+                                           "upload or try again.")
+                return
+            await message.channel.send("Uploaded")
+            print("Saved")
+            try:
+                info = subprocess.check_output(["./pboinfo.py",
+                                                outfile]).decode('utf-8')
+            except Exception:
+                traceback.print_exc()
+                await message.channel.send("Failed to get PBO info")
+            else:
+                await message.channel.send(info)
+            if self.remote_folder:
+                print("remote_folder set, moving")
                 try:
-                    if os.path.isfile(final_path):
-                        print(f"{final_path} exists")
-                        await message.channel.send(f"File {name} "
-                                                   "already exists!")
-                        return
-                except OSError:
-                    # Will download locally, check the PBO and complain later
-                    pass
-                outfile = self.local_folder / name
-                if await attachment.save(outfile) != attachment.size:
-                    await message.channel.send("Save failed. Request a manual "
-                                               "upload or try again.")
-                    return
-                await message.channel.send("Uploaded")
-                print("Saved")
-                try:
-                    info = subprocess.check_output(["./pboinfo.py",
-                                                    outfile]).decode('utf-8')
-                except Exception:
+                    shutil.move(outfile, self.remote_folder / name)
+                except (FileNotFoundError, PermissionError, OSError) as e:
                     traceback.print_exc()
-                    await message.channel.send("Failed to get PBO info")
+                    await message.channel.send(
+                            f"{self.owner.mention}: Failed to move "
+                            f"the file: {e}")
                 else:
-                    await message.channel.send(info)
-                if self.remote_folder:
-                    print("remote_folder set, moving")
-                    try:
-                        shutil.move(outfile, self.remote_folder / name)
-                    except (FileNotFoundError, PermissionError, OSError) as e:
-                        traceback.print_exc()
-                        await message.channel.send(
-                                f"{self.owner.mention}: Failed to move "
-                                f"the file: {e}")
-                    else:
-                        await message.channel.send("File moved")
-                        print("Moved successfully")
+                    await message.channel.send("File moved")
+                    print("Moved successfully")
 
     def is_me(self, m):
         return m.author == self.user
