@@ -10,7 +10,18 @@ import urllib.request
 import re
 from datetime import datetime
 
-platform="linux"
+def detect_platform():
+    import sys
+    if sys.platform in ["Windows, cygwin"]:
+        return "windows"
+    elif sys.platform == "linux":
+        import platform
+        if "Microsoft" in platform.release():
+            return "wsl"
+        else:
+            return "linux"
+
+platform=detect_platform()
 
 try:
     with urllib.request.urlopen(
