@@ -37,7 +37,7 @@ def get_info(filename):
     else:
         filename_date = "INVALID FORMAT"
 
-    # TODO: Make path portable
+    # TODO: Make path more portable
     try:
         output = subprocess.check_output([f"{home}/files/bin/pboinfo", "-j",
                                           filename], timeout=10)
@@ -61,13 +61,13 @@ def get_info(filename):
     else:
         version_info = "No template version found"
 
-    return (f"""PBO information:
-
-            Date from filename: {filename_date}
-            Operation name: {info['operation']}
-            Author: {info['author']}
-            Faction: {info['faction']}
-            {version_info}""")
+    return (f"PBO information:\n"
+            f"\n"
+            f"Date from filename: {filename_date}\n"
+            f"Operation name: {info['operation']}\n"
+            f"Author: {info['author']}\n"
+            f"Faction: {info['faction']}\n"
+            f"{version_info}")
 
 
 if __name__ == "__main__":
