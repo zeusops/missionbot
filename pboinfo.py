@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import subprocess
+import traceback
 import json
 import sys
 import argparse
@@ -45,7 +46,12 @@ def get_info(filename):
         print("Call to pboinfo failed:")
         print(e.output.decode('utf-8'))
         return False
-    info = json.loads(output)
+    try:
+        info = json.loads(output)
+    except json.decoder.JSONDecodeError as e:
+        print(f"Failed to decode JSON: {e}")
+        traceback.print_exc()
+        return False
     if info['version'] != 'NOTFOUND':
         if latest_version:
             pbo_version = version.parse(info['version'])
