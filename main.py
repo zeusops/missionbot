@@ -13,6 +13,8 @@ from discord.message import Message
 import config as cfg
 from pboinfo import get_info
 
+CFG_VERSION = 1
+
 
 def detect_platform():
     if sys.platform in ["win32", "cygwin"]:
@@ -39,6 +41,11 @@ class Bot(commands.Bot):
             missionpath = "/mnt/c/server/link/mpmissions"
         else:
             missionpath = f"{home}/link/mpmissions"
+
+        if cfg.CFG_VERSION != CFG_VERSION:
+            raise ValueError(f"Unsupported config version. "
+                             f"Expected {CFG_VERSION}, "
+                             f"found {cfg.CFG_VERSION}")
 
         self.local_folder = pathlib.Path(missionpath)
         self.remote_folder = pathlib.Path(cfg.REMOTE_FOLDER)
