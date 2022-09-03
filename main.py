@@ -15,10 +15,10 @@ from pboinfo import get_info
 
 
 def detect_platform():
-    if sys.platform in ["Windows, cygwin"]:
+    if sys.platform in ["win32", "cygwin"]:
         return "windows"
     if sys.platform == "linux":
-        if "Microsoft" in platform.release():
+        if "microsoft" in platform.release().lower():
             return "wsl"
         return "linux"
     raise ValueError(f"Unsupported platform {sys.platform}")
