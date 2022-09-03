@@ -6,6 +6,7 @@ import shutil
 import sys
 import traceback
 
+import discord
 from discord import ChannelType
 from discord.ext import commands
 from discord.message import Message
@@ -117,6 +118,8 @@ class Bot(commands.Bot):
 
 if __name__ == "__main__":
     print("Connecting")
-    bot = Bot('.')
+    intents = discord.Intents.default()
+    intents.messages = True
+    bot = Bot('.', intents=intents)
 
     bot.run(cfg.TOKEN)
