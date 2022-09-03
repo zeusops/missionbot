@@ -4,8 +4,9 @@ import pathlib
 import shutil
 import traceback
 
-from discord.ext import commands
 from discord import ChannelType
+from discord.ext import commands
+from discord.message import Message
 
 import config as cfg
 from pboinfo import get_info
@@ -26,7 +27,7 @@ def detect_platform():
 class Bot(commands.Bot):
     def __init__(self, *argv, **argc):
         super().__init__(*argv, **argc)
-        self.gehock = None
+        self.owner = None
 
         platform = detect_platform()
         home = os.environ['HOME']
@@ -47,25 +48,22 @@ class Bot(commands.Bot):
         print(self.user.name)
         print(self.user.id)
         print("----")
-        # server = client.get_guild(cfg.serverid)
-        # channel = client.get_channel(cfg.channelid)
         self.owner = await self.fetch_user(150625032656125952)
-        self.owner_dm = self.owner.dm_channel
 
-    async def on_message(self, message):
+    async def on_message(self, message: Message):
         if self.is_me(message):
             return
         if (message.channel.id not in cfg.CHANNEL_IDS
                 and not (message.channel.type == ChannelType.private
                          and message.author == self.owner)):
+            # Message was outside of upload channel or owner's DM
             print(f"#{message.channel}: <{message.author}> {message.content}")
             return
 
         print("Received a message")
         for attachment in message.attachments:
             name = attachment.filename
-            ext = name.split('.')[-1]
-            if ext != 'pbo':
+            if not name.endswith('.pbo'):
                 print(f"{name} is not a pbo")
                 await message.channel.send("Not a pbo, not uploading")
                 return
