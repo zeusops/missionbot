@@ -48,7 +48,8 @@ class Bot(commands.Bot):
                              f"found {cfg.CFG_VERSION}")
 
         self.local_folder = pathlib.Path(missionpath)
-        self.remote_folder = pathlib.Path(cfg.REMOTE_FOLDER)
+        self.remote_folder = (pathlib.Path(cfg.REMOTE_FOLDER)
+                              if cfg.REMOTE_FOLDER else None)
 
     async def on_ready(self):
         print("Logged in as")
