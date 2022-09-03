@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import os
 import pathlib
+import platform
 import shutil
+import sys
 import traceback
 
 from discord import ChannelType
@@ -13,15 +15,13 @@ from pboinfo import get_info
 
 
 def detect_platform():
-    import sys
     if sys.platform in ["Windows, cygwin"]:
         return "windows"
-    elif sys.platform == "linux":
-        import platform
+    if sys.platform == "linux":
         if "Microsoft" in platform.release():
             return "wsl"
-        else:
-            return "linux"
+        return "linux"
+    raise ValueError(f"Unsupported platform {sys.platform}")
 
 
 class Bot(commands.Bot):
