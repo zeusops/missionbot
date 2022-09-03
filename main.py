@@ -33,8 +33,6 @@ class Bot(commands.Bot):
 
         platform = detect_platform()
         home = os.environ['HOME']
-        print(home)
-        print(os.environ)
         if platform == "windows":
             missionpath = "C:/server/link/mpmissions"
         elif platform == "wsl":
