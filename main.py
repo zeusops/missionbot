@@ -76,6 +76,7 @@ class Bot(commands.Bot):
                 return
             print(f"Handling {name}")
             path = self.remote_folder or self.local_folder
+            os.makedirs(path, exist_ok=True)
             final_path = path / name
             print("Checking existing file")
             try:
