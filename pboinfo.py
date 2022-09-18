@@ -38,10 +38,14 @@ def get_info(filename):
     else:
         filename_date = "INVALID FORMAT"
 
-    # TODO: Make path more portable
     try:
-        output = subprocess.check_output([f"{home}/files/bin/pboinfo", "-j",
-                                          filename], timeout=10)
+        script_path = os.path.dirname(os.path.abspath(__file__))
+        env = {
+                'BASE_PATH': script_path,
+                'STEAMCMD': 'none',
+                **os.environ}
+        script = (f"{script_path}/server-handling/bin/pboinfo")
+        output = subprocess.check_output([script, "-j", filename], timeout=10, env=env)
     except subprocess.CalledProcessError as e:
         print("Call to pboinfo failed:")
         print(e.output.decode('utf-8'))
