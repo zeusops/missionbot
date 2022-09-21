@@ -11,7 +11,8 @@ print("Connecting")
 client = discord.Client()
 
 gehock = None
-downloadfolder = "/home/zeusops/link/mpmissions"
+user=os.environ["USER"]
+downloadfolder = "/home/{}/link/mpmissions".format(user)
 
 @client.event
 async def on_ready():
@@ -58,7 +59,7 @@ async def on_message(message):
                 #r.urlretrieve(attachment.url, downloadfolder + "/" + attachment.filename)
                 ret = subprocess.run(["wget", attachment.url, "-O", outfile])
                 if ret.returncode == 0:
-                    await message.channel.send("Uploaded")
+                    await message.channel.send("Uploaded to hades")
                     #await message.channel.send("{} pls upload".format(gehock.mention))
                     try:
                         info=subprocess.check_output(["./pboinfo.py", attachment.filename]).decode('utf-8')

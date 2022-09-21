@@ -4,12 +4,14 @@ import pathlib
 import json
 import sys
 import argparse
+import os
 from packaging import version
 import urllib.request
 import re
 from datetime import datetime
 
 platform="linux"
+user=os.environ["USER"]
 
 try:
     with urllib.request.urlopen(
@@ -29,7 +31,7 @@ if platform=="windows":
 elif platform=="wsl":
     missionpath="/mnt/c/server/link/mpmissions"
 else:
-    missionpath="/home/$USER/link/mpmissions"
+    missionpath="/home/{}/link/mpmissions".format(user)
 
 missions=pathlib.Path(missionpath)
 
@@ -50,7 +52,7 @@ else:
 
 # TODO: Make path portable
 try:
-    output=subprocess.check_output(["/home/$USER/files/bin/pboinfo", "-j",
+    output=subprocess.check_output(["/home/{}/files/bin/pboinfo".format(user), "-j",
                                    str(missions / filename)], timeout=10)
 except subprocess.CalledProcessError as e:
     print("Call to pboinfo failed:")
