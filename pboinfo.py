@@ -22,8 +22,6 @@ def get_info(filename):
     except urllib.error.HTTPError:
         latest_version = None
 
-    home = os.environ['HOME']
-
     match = re.search("^Zeus_(\\d\\d\\d\\d\\d\\d)_",
                       os.path.basename(filename))
     if match:
@@ -45,7 +43,8 @@ def get_info(filename):
                 'STEAMCMD': 'none',
                 **os.environ}
         script = (f"{script_path}/server-handling/bin/pboinfo")
-        output = subprocess.check_output([script, "-j", filename], timeout=10, env=env)
+        output = subprocess.check_output([script, "-j", filename], timeout=10,
+                                         env=env)
     except subprocess.CalledProcessError as e:
         print("Call to pboinfo failed:")
         print(e.output.decode('utf-8'))
